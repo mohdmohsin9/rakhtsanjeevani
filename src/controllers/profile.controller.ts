@@ -96,7 +96,16 @@ export const getProfile = async (
 
     return res.json({
       success: true,
-      data: profile,
+      data: {
+        ...profile.toObject(),
+        badge: profile.is_active_donor ? "SAVIOUR" : "VOLUNTEER",
+        rewards_preview: "Earn Instant Rewards*",
+        benefits: [
+          "FREE Checkups (OPD/DIAGNOSTICS)",
+          "NO-COST Health Insurance",
+          "Quick FREE AMBULANCE for Self & Family"
+        ]
+      }
     });
   } catch (error) {
     console.error(error);

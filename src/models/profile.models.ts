@@ -4,7 +4,6 @@ const profileSchema = new mongoose.Schema(
   {
     user_id: {
       type: String,
-      required: true,
       unique: true,
     },
 
@@ -20,7 +19,7 @@ const profileSchema = new mongoose.Schema(
 
     phone: {
       type: String,
-      required: true,
+
     },
 
     address: {
@@ -35,7 +34,7 @@ const profileSchema = new mongoose.Schema(
 
     language: {
       type: String,
-      required: true,
+
     },
 
     profile_picture: {

@@ -1,11 +1,15 @@
 import express from "express";
-import { upsertProfile, getProfile } from "../controllers/profile.controller";
+import { upsertProfile, getProfile, addAddress, updateAddress, deleteAddress } from "../controllers/profile.controller";
 import { verifyToken } from "../middlewares/authtoken";   // ✅ ADD
 const router = express.Router();
 
 router.post("/profile", verifyToken, upsertProfile);
 router.get("/profile/:userId", verifyToken, getProfile);
 
+// Address Management
+router.post("/profile/address", verifyToken, addAddress);
+router.put("/profile/address/:addressId", verifyToken, updateAddress);
+router.delete("/profile/address/:addressId", verifyToken, deleteAddress);
 
 export default router;
 

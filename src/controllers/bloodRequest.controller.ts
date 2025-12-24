@@ -7,10 +7,23 @@ export const createBloodRequest = async (req: Request, res: Response) => {
   try {
     // Assuming user_id is coming from auth middleware via req.body or req.user
     // For now taking from body for simplicity, but ideally from req.user
-    const { requester_id, patient_name, blood_group, units, hospital_name, location, date_needed, contact_number, is_emergency, additional_note } = req.body;
+    const { 
+      requester_id, 
+      patient_name, 
+      blood_group, 
+      units, 
+      hospital_name, 
+      location, 
+      latitude,
+      longitude,
+      date_needed, 
+      contact_number, 
+      is_emergency, 
+      additional_note 
+    } = req.body;
 
-    if (!requester_id || !patient_name || !blood_group || !units || !hospital_name || !location || !date_needed || !contact_number) {
-      return res.status(400).json({ message: "All fields are required" });
+    if (!requester_id || !patient_name || !blood_group || !units || !hospital_name || !location || !latitude || !longitude || !date_needed || !contact_number) {
+      return res.status(400).json({ message: "All fields including precise location are required" });
     }
 
     const newRequest = new BloodRequest({
@@ -20,6 +33,8 @@ export const createBloodRequest = async (req: Request, res: Response) => {
       units,
       hospital_name,
       location,
+      latitude,
+      longitude,
       date_needed,
       contact_number,
       is_emergency,

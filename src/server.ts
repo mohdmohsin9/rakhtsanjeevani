@@ -6,6 +6,7 @@ import connectDB from './config/db';
 import languageRoutes from './routes/language.routes';
 import profileRoutes from './routes/profile.routes';
 import bloodRequestRoutes from './routes/bloodRequest.routes';
+import { addAddress } from './controllers/profile.controller';
 
 const app = express();
 const PORT = process.env.PORT || 4000;

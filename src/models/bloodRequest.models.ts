@@ -28,6 +28,14 @@ const bloodRequestSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    latitude: {
+      type: Number,
+      required: true, // Required for precise donor matching
+    },
+    longitude: {
+      type: Number,
+      required: true, // Required for precise donor matching
+    },
     date_needed: {
       type: Date,
       required: true,

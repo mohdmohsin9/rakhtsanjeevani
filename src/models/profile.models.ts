@@ -22,10 +22,24 @@ const profileSchema = new mongoose.Schema(
 
     },
 
-    address: {
-      type: String,
-      default: "",
-    },
+    addresses: [
+      {
+        label: {
+          type: String,
+          enum: ["Home", "Work", "Other"],
+          default: "Home",
+        },
+        flat: { type: String, default: "" }, // Flat / House / Floor / Building
+        area: { type: String, default: "" }, // Street name / Area
+        landmark: { type: String, default: "" }, // Nearby landmark
+        city: { type: String, default: "" },
+        state: { type: String, default: "" },
+        pincode: { type: String, default: "" },
+        latitude: { type: Number },
+        longitude: { type: Number },
+        fullAddress: { type: String, required: true }, // Combined address for display
+      },
+    ],
 
     location: {
       type: String, // General location string (e.g. City, Area)

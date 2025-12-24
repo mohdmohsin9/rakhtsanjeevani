@@ -16,7 +16,7 @@ export const upsertProfile = async (
       name,
       email,
       phone,
-      address,
+      addresses,
       language,
       profile_picture,
       // New fields from payload
@@ -44,7 +44,7 @@ export const upsertProfile = async (
         name,
         email,
         phone,
-        address,
+        addresses,
         language,
         profile_picture: profile_picture || "",
         
@@ -107,6 +107,122 @@ export const getProfile = async (
         ]
       }
     });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+/**
+ * ADD ADDRESS
+ */
+export const addAddress = async (req: Request & { userId?: string }, res: Response) => {
+  try {
+    const userId = req.userId;
+    const { 
+      label, 
+      flat, 
+      area, 
+      landmark, 
+      city, 
+      state, 
+      pincode, 
+      latitude, 
+      longitude, 
+      fullAddress 
+    } = req.body;
+
+    if (!fullAddress) {
+      return res.status(400).json({ error: "fullAddress is required" });
+    }
+
+    const profile = await Profile.findOneAndUpdate(
+      { user_id: userId },
+      { 
+        $push: { 
+          addresses: { 
+            label, flat, area, landmark, city, state, pincode, latitude, longitude, fullAddress 
+          } 
+        } 
+      },
+      { new: true, upsert: true }
+    );
+
+    return res.json({ success: true, data: profile.addresses });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+/**
+ * UPDATE ADDRESS
+ */
+export const updateAddress = async (req: Request & { userId?: string }, res: Response) => {
+  try {
+    const userId = req.userId;
+    const { addressId } = req.params;
+    const { 
+      label, 
+      flat, 
+      area, 
+      landmark, 
+      city, 
+      state, 
+      pincode, 
+      latitude, 
+      longitude, 
+      fullAddress 
+    } = req.body;
+
+    const profile = await Profile.findOneAndUpdate(
+      { user_id: userId, "addresses._id": addressId },
+      { 
+        $set: { 
+          "addresses.$.label": label,
+          "addresses.$.flat": flat,
+          "addresses.$.area": area,
+          "addresses.$.landmark": landmark,
+          "addresses.$.city": city,
+          "addresses.$.state": state,
+          "addresses.$.pincode": pincode,
+          "addresses.$.latitude": latitude,
+          "addresses.$.longitude": longitude,
+          "addresses.$.fullAddress": fullAddress 
+        } 
+      },
+      { new: true }
+    );
+
+    if (!profile) {
+      return res.status(404).json({ error: "Address or profile not found" });
+    }
+
+    return res.json({ success: true, data: profile.addresses });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+/**
+ * DELETE ADDRESS
+ */
+export const deleteAddress = async (req: Request & { userId?: string }, res: Response) => {
+  try {
+    const userId = req.userId;
+    const { addressId } = req.params;
+
+    const profile = await Profile.findOneAndUpdate(
+      { user_id: userId },
+      { $pull: { addresses: { _id: addressId } } },
+      { new: true }
+    );
+
+    if (!profile) {
+      return res.status(404).json({ error: "Profile not found" });
+    }
+
+    return res.json({ success: true, data: profile.addresses });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: "Internal server error" });

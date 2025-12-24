@@ -31,9 +31,9 @@ export const upsertProfile = async (
       is_aadhar_kyc_verified
     } = req.body;
 
-    if (!userId || !phone || !language) {
+    if (!userId) {
       return res.status(400).json({
-        error: "phone and language are required",
+        error: "User ID is missing from token",
       });
     }
 

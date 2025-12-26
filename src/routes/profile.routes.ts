@@ -15,9 +15,9 @@ router.post("/profile", verifyToken, upsertProfile);
 router.get("/profile", verifyToken, getProfile);
 
 // Address Management
-router.post("/profile/address", verifyToken, addAddress);
-router.put("/profile/address/:addressId", verifyToken, updateAddress);
-router.delete("/profile/address/:addressId", verifyToken, deleteAddress);
+router.post("/address", verifyToken, addAddress);
+router.put("/address/:addressId", verifyToken, updateAddress);
+router.delete("/address/:addressId", verifyToken, deleteAddress);
 
 export default router;
 

@@ -112,7 +112,8 @@ export const addAddress = async (req: Request & { userId?: string }, res: Respon
   try {
     const userId = req.userId;
     const { 
-      label, 
+      type, // from frontend
+      label, // alternate
       flat, 
       area, 
       landmark, 
@@ -124,16 +125,35 @@ export const addAddress = async (req: Request & { userId?: string }, res: Respon
       fullAddress 
     } = req.body;
 
-    if (!fullAddress) {
-      return res.status(400).json({ error: "fullAddress is required" });
+    console.log("Add Address Request Body:", req.body);
+    console.log("User ID from token:", userId);
+
+    if (!userId) {
+      return res.status(401).json({ error: "User ID not found in token" });
     }
+
+    // Data sanitization & construction
+    const sanitizedLabel = type || label || "Home";
+    const finalFullAddress = fullAddress || `${flat ? flat + ', ' : ''}${landmark ? landmark + ', ' : ''}${area || ''}`.trim() || "Address not provided";
+
+    const numLat = latitude && !isNaN(Number(latitude)) ? Number(latitude) : undefined;
+    const numLng = longitude && !isNaN(Number(longitude)) ? Number(longitude) : undefined;
 
     const profile = await Profile.findOneAndUpdate(
       { user_id: userId },
       { 
         $push: { 
           addresses: { 
-            label, flat, area, landmark, city, state, pincode, latitude, longitude, fullAddress 
+            label: sanitizedLabel, 
+            flat: flat || "", 
+            area: area || "", 
+            landmark: landmark || "", 
+            city: city || "", 
+            state: state || "", 
+            pincode: pincode || "", 
+            latitude: numLat, 
+            longitude: numLng, 
+            fullAddress: finalFullAddress 
           } 
         } 
       },
@@ -141,9 +161,13 @@ export const addAddress = async (req: Request & { userId?: string }, res: Respon
     );
 
     return res.json({ success: true, data: profile.addresses });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: "Internal server error" });
+  } catch (error: any) {
+    console.error("Error in addAddress:", error);
+    return res.status(500).json({ 
+      error: "Internal server error", 
+      message: error.message,
+      details: error.errors // Mongoose validation errors
+    });
   }
 };
 

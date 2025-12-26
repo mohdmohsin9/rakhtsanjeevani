@@ -50,7 +50,7 @@ export const getNotifications = async (
     });
 
     // Count unread
-    const unreadCount = notifications.filter((n) => !n.is_read).length;
+const unreadCount = notifications.filter((n) => !n.is_read).length;
 
     return res.json({
       success: true,

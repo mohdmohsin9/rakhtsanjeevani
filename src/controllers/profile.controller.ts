@@ -19,7 +19,6 @@ export const upsertProfile = async (
       addresses,
       language,
       profile_picture,
-      // New fields from payload
       blood_group,
       dob,
       age,
@@ -48,7 +47,6 @@ export const upsertProfile = async (
         language,
         profile_picture: profile_picture || "",
         
-        // Saving new fields
         blood_group,
         dob,
         age,
@@ -76,11 +74,7 @@ export const upsertProfile = async (
     return res.status(500).json({ error: "Internal server error" });
   }
 };
-/** 
 
-  GET MY PROFILE
-  user_id JWT token se aayega
- */
 export const getProfile = async (
   req: Request & { userId?: string },
   res: Response
@@ -98,6 +92,7 @@ export const getProfile = async (
       success: true,
       data: {
         ...profile.toObject(),
+        user_id: profile.user_id,
         badge: profile.is_active_donor ? "SAVIOUR" : "VOLUNTEER",
         rewards_preview: "Earn Instant Rewards*",
         benefits: [
@@ -112,9 +107,7 @@ export const getProfile = async (
     return res.status(500).json({ error: "Internal server error" });
   }
 };
-/**
- * ADD ADDRESS
- */
+
 export const addAddress = async (req: Request & { userId?: string }, res: Response) => {
   try {
     const userId = req.userId;
@@ -154,9 +147,6 @@ export const addAddress = async (req: Request & { userId?: string }, res: Respon
   }
 };
 
-/**
- * UPDATE ADDRESS
- */
 export const updateAddress = async (req: Request & { userId?: string }, res: Response) => {
   try {
     const userId = req.userId;
@@ -204,9 +194,6 @@ export const updateAddress = async (req: Request & { userId?: string }, res: Res
   }
 };
 
-/**
- * DELETE ADDRESS
- */
 export const deleteAddress = async (req: Request & { userId?: string }, res: Response) => {
   try {
     const userId = req.userId;

@@ -13,7 +13,7 @@ const router = express.Router();
 
 router.post("/blood-requests", verifyToken, createBloodRequest);
 router.get("/blood-requests", verifyToken, getAllBloodRequests);
-router.get("/blood-requests/user/:user_id", verifyToken, getMyRequests);
+router.get("/blood-requests/my-requests", verifyToken, getMyRequests);
 router.get("/blood-requests/:id", verifyToken, getBloodRequestById);
 router.put("/blood-requests/:id/accept", verifyToken, acceptBloodRequest);
 

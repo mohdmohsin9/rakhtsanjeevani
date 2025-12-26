@@ -2,6 +2,11 @@ import mongoose from "mongoose";
 
 const bloodRequestSchema = new mongoose.Schema(
   {
+    order_id: {
+      type: String,
+      unique: true,
+      index: true,
+    },
     requester_id: {
       type: String, // Changed from ObjectId to String to support custom IDs like 'RS234789'
       required: true,

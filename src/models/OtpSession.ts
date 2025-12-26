@@ -3,7 +3,6 @@ import mongoose, { Document, Schema } from 'mongoose';
 export interface IOtpSession extends Document {
   countryCode: string;
   mobileNumber: string;
-  fullPhoneKey: string;
   otp: string;
   expiresAt: Date;
   verified: boolean;
@@ -24,12 +23,6 @@ const OtpSessionSchema = new Schema<IOtpSession>(
         type: String,
         required: true 
     },  
-    fullPhoneKey: 
-    { 
-        type: String,
-        required: true,
-        index: true 
-    },
     otp: 
     { 
         type: String,
@@ -55,6 +48,8 @@ const OtpSessionSchema = new Schema<IOtpSession>(
     timestamps: true,
   }
 );
+
+OtpSessionSchema.index({ countryCode: 1, mobileNumber: 1 });
 
 export const OtpSession = mongoose.model<IOtpSession>('OtpSession', OtpSessionSchema);
 

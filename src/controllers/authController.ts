@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';    // ✅ ADD (1 line)
 import { OtpSession } from '../models/OtpSession';
 import { User } from '../models/user.models';   // ✅ ADD
+import { generateUserId } from '../utils/generators';
   
 const generateOtp = (): string => {
   const min = 10000;
@@ -28,23 +29,21 @@ export const sendOtp = async (req: Request, res: Response) => {
       });
     }
 
-    const fullPhoneKey = `${countryCode}${cleanedMobile}`;
     const otp = generateOtp();
     const ttlMs = 5 * 60 * 1000;
     const expiresAt = new Date(Date.now() + ttlMs);
 
-    await OtpSession.deleteMany({ fullPhoneKey });
+    await OtpSession.deleteMany({ countryCode, mobileNumber: cleanedMobile });
 
     await OtpSession.create({
       countryCode,
       mobileNumber: cleanedMobile,
-      fullPhoneKey,
       otp,
       expiresAt,
       verified: false,
     });
 
-    console.log(`OTP for ${fullPhoneKey}: ${otp}`);
+    console.log(`OTP for ${countryCode}${cleanedMobile}: ${otp}`);
 
     return res.json({
       success: true,
@@ -73,9 +72,8 @@ export const verifyOtp = async (req: Request, res: Response) => {
 
 
     const cleanedMobile = String(mobileNumber).replace(/\D/g, '');
-    const fullPhoneKey = `${countryCode}${cleanedMobile}`;
 
-    const session = await OtpSession.findOne({ fullPhoneKey })
+    const session = await OtpSession.findOne({ countryCode, mobileNumber: cleanedMobile })
       .sort({ createdAt: -1 })
       .exec();
 
@@ -104,13 +102,14 @@ export const verifyOtp = async (req: Request, res: Response) => {
     session.verifiedAt = new Date();
     await session.save();
 
-    let user = await User.findOne({ fullPhoneKey });
+    let user = await User.findOne({ countryCode, mobileNumber: cleanedMobile });
 
     if (!user) {
+      const userId = await generateUserId();
       user = await User.create({
+        user_id: userId,
         countryCode,
         mobileNumber: cleanedMobile,
-        fullPhoneKey,
         isVerified: true,
       });
     }
@@ -125,7 +124,7 @@ export const verifyOtp = async (req: Request, res: Response) => {
       success: true,
       message: 'OTP verified successfully.',
       token,
-      user_id: user._id,
+      user_id: user.user_id || user._id,
     });
   } catch (error) {
     console.error('Error in verifyOtp:', error);
@@ -148,9 +147,8 @@ export const getOtpSessionStatus = async (req: Request, res: Response) => {
     }
 
     const cleanedMobile = String(mobileNumber).replace(/\D/g, '');
-    const fullPhoneKey = `${countryCode}${cleanedMobile}`;
 
-    const session = await OtpSession.findOne({ fullPhoneKey })
+    const session = await OtpSession.findOne({ countryCode, mobileNumber: cleanedMobile })
       .sort({ createdAt: -1 })
       .exec();
 
